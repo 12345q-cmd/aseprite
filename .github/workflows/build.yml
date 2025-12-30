@@ -1,39 +1,39 @@
-name: build
-on: [push, pull_request]
+name   名称:构建: build
+on   触发条件：[推送，拉取请求]: [push, pull_request]
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on运行于：${{ matrix.os }}: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        build_type: [RelWithDebInfo, Debug]
+        os操作系统：[Windows 最新版本，macOS 最新版本，Ubuntu 最新版本]: [windows-latest]
+        build_type构建类型：[带有调试信息的发布版，调试版]: [RelWithDebInfo, Debug]
         ui: [gui, cli]
         scripting: [lua, noscripts]
         exclude:
-          - build_type: Debug
-            ui: gui
-          - build_type: RelWithDebInfo
-            ui: cli
-          - build_type: RelWithDebInfo
+          -    —build_type：调试build_type: Debug
+            ui   iu: gui: gui
+          - 构建类型：带有调试信息的发布版build_type: RelWithDebInfo
+            ui   iu防疫:: cli
+          - 构建类型：带有调试信息的发布版build_type: RelWithDebInfo
             scripting: noscripts
     steps:
-    - uses: actions/checkout@v4
+    - - 使用：actions/checkout@v4uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-    - name: Install Dependencies
-      if: runner.os == 'Linux'
-      shell: bash
+    - - 名称：安装依赖项name: Install Dependencies
+      if   如果：运行者操作系统为“Linux”: runner.os == 'Linux'
+      shell   bash shell:: bash
       run: |
-        sudo apt-get update -qq
+        sudo apt-get update -qq   以静默模式更新软件包列表：`sudo apt-get update -qq`
         sudo apt-get install -y \
           libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
           libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev \
           libfontconfig1-dev
-    - name: Install Skia
+    -    —name：安装Skianame: Install Skia
       if: ${{ matrix.ui == 'gui' }}
-      shell: bash
-      run: |
+      shell   bash shell:   壳牌: bash
+      run   运行: |
         if [[ "${{ runner.os }}" == "Windows" ]] ; then
           this_dir=$(cygpath "${{ github.workspace }}")
         else
@@ -41,18 +41,18 @@ jobs:
         fi
         skia_url=$(source $this_dir/laf/misc/skia-url.sh | xargs)
         skia_file=$(basename $skia_url)
-        curl --ssl-revoke-best-effort -L -o "$skia_file" "$skia_url"
+        curl --ssl-revoke-best-effort -L -o "$skia_file" "$skia_url"使用最佳努力撤销 SSL 证书，通过链接下载并保存到指定文件：`curl --ssl-revoke-best-effort -L -o "$skia_file" "$skia_url"`
         unzip "$skia_file" -d skia
-    - name: ccache
+    -    —名称：ccachename   名字: ccache
       uses: hendrikmuhs/ccache-action@v1.2.17
-      if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-      with:
+      if   如果: ${{ runner.os == 'Linux'   “Linux” || runner.os == 'macOS' }}
+      with   与:
         key: ${{ matrix.os }}-${{ matrix.ui }}-${{ matrix.scripting }}-${{ matrix.build_type }}
     - uses: aseprite/get-ninja@main
     - uses: ilammy/msvc-dev-cmd@v1
-      if: runner.os == 'Windows'
-    - name: Generating Makefiles
-      shell: bash
+      if   如果: runner.os == 'Windows'
+    - name   名字: Generating Makefiles
+      shell   bash shell:: bash
       run: |
         if [[ "${{ runner.os }}" == "Windows" ]] ; then
           export enable_ccache=off
